@@ -1,7 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BarberController } from './barber.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { BarberService } from './barber.service';
+import { BarberSchema, Barber } from './barber.schema';
+import { FormatDate } from '../helper/date.helper';
 
 @Module({
-  controllers: [BarberController]
+  imports: [MongooseModule.forFeature([{name:Barber.name, schema:BarberSchema}])],
+  providers: [BarberService, FormatDate],
+  exports: [BarberService]
 })
 export class BarberModule {}
