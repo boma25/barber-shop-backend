@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {User, UserDocument} from './schemas/user.schema'
@@ -13,7 +13,7 @@ import { BookService } from '../book/book.service';
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, private bookService: BookService){}
 
-    async createUser(createUserDto:CreateUserDto):Promise<UserInterface|string>{
+    async createUser(createUserDto:CreateUserDto):Promise<UserInterface|string|HttpException>{
         try{
             const newUser = new this.userModel(createUserDto)
             const user = await newUser.save()
@@ -22,18 +22,22 @@ export class UserService {
         }catch(error){
             console.log(error)
             if(error.message.split(" ")[0] === "E11000"){
-                return ` A user with this email ${error.keyValue.email} already exists`
+                throw new HttpException(`A user with this email ${error.keyValue.email} already exists`, HttpStatus.CONFLICT)
             }
-            return error.message
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
         }
     }
 
     async findOne(email:string){
         try{
             const user = await this.userModel.findOne({email})
+            if(!user){
+
+                throw new HttpException(`A user with this email ${email} does not exists`, HttpStatus.BAD_REQUEST)
+            }
             return user
         }catch(error){
-            return error.message
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -41,11 +45,12 @@ export class UserService {
         try{
             const user = await this.userModel.findById(createBookDto.user)
             if(!user){
-                return "invalid user"
+                throw new HttpException(`user does not exists`, HttpStatus.BAD_REQUEST)
+            
             }
             return await this.bookService.newBook({...createBookDto, user:user._id})
         }catch(error){
-            return error
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
         }
     }
 

@@ -10,7 +10,7 @@ export class Barber{
     @Prop({required:true})
     number:number
 
-    @Prop({required:true})
+    @Prop({required:true, unique: true})
     date:Date
 }
 

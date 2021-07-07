@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Barber,BarberDocument } from './Schema/barber.schema';
 import { Model } from 'mongoose';
@@ -13,9 +13,12 @@ export class BarberService {
         try{
             const newBarber = new this.barberModel(createBarberDto)
             await newBarber.save()
-            return "Babrber added"
+            return "Barber added"
         }catch(error){
-            return error
+            if(error.message.split(" ")[0] === "E11000"){
+                throw new HttpException('you have already created a barber for this dat to change this try updating the barber', HttpStatus.CONFLICT)
+            }
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
         }
     }
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BookDocument, Book } from './Schema/book.schema';
 import { Model } from 'mongoose';
@@ -12,7 +12,11 @@ export class BookService {
     constructor(@InjectModel(Book.name) private bookModel:Model<BookDocument>, private barberService:BarberService, private formatDate:FormatDate ){}
     
     async getAllBooks(){
-        return SerializeBook(await this.bookModel.find().populate('user'))
+        const books = await this.bookModel.find().populate('user')
+        if(books.length === 0){
+            return books
+        }
+        return SerializeBook(books)
     }
 
     async newBook(createBookDto:CreateBookDto){
@@ -34,12 +38,12 @@ export class BookService {
             try{
                 const book = new this.bookModel(createBookDto)
                 book.save()
-                return 'your order has booking was successfully'
+                return 'your booking was successfully'
             }catch(error){
-                return error
+            throw new HttpException(error.message, HttpStatus.BAD_REQUEST)
             }
         }
-        return 'No more available barbers for this time try a different time'
+        throw new HttpException('No more available barbers for this time try a different time', HttpStatus.EXPECTATION_FAILED)
     }
 
 }

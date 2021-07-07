@@ -10,6 +10,9 @@ export type BookDocument = Book & Document
 export class Book{
 
     @Prop({required:true})
+    service:string
+
+    @Prop({required:true})
     date:Date
 
     @Prop({required: true})
