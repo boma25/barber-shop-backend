@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Barber,BarberDocument } from './barber.schema';
+import { Barber,BarberDocument } from './Schema/barber.schema';
 import { Model } from 'mongoose';
 import { CreateBarberDto } from './Dto/create-barber.Dto';
 import {FormatDate} from '../helper/date.helper'

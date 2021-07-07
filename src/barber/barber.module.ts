@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BarberService } from './barber.service';
-import { BarberSchema, Barber } from './barber.schema';
+import { BarberSchema, Barber } from './Schema/barber.schema';
 import { FormatDate } from '../helper/date.helper';
 
 @Module({
